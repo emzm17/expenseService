@@ -21,7 +21,7 @@ public class ExpenseController {
     }
 
     @GetMapping("/expense/v1/")
-    public ResponseEntity<List<ExpenseDto>> getExpenses(@PathParam("user_id")@NonNull String userId){
+    public ResponseEntity<List<ExpenseDto>> getExpenses(@RequestHeader(value = "X-User-Id") @NonNull String userId){
          try{
               List<ExpenseDto> expenseDtoList = expenseService.getExpense(userId);
               return new ResponseEntity<>(expenseDtoList, HttpStatus.OK);
@@ -38,6 +38,39 @@ public class ExpenseController {
             return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
         }
     }
+    @DeleteMapping("/expense/v1/{expenseId}")
+    public ResponseEntity<String> deleteExpense(@RequestHeader(value = "X-User-Id" )@NonNull String userId, @PathVariable String expenseId ){
+         try{
+               String message = "Expense with ID " + expenseId + " was successfully deleted.";
+               expenseService.deleteExpense(expenseId);
+               return new ResponseEntity<>(message, HttpStatus.OK);
+         }catch (Exception ex){
+              return new ResponseEntity<>("something wrong with this",HttpStatus.BAD_REQUEST);
+         }
+    }
+
+
+    @GetMapping("/expense/v1/{expenseId}")
+    public ResponseEntity<ExpenseDto> getExpenses(@RequestHeader(value = "X-User-Id" )@NonNull String userId, @PathVariable String expenseId ){
+        try{
+            ExpenseDto expenseDto = expenseService.getParticularExpense(expenseId);
+            return new ResponseEntity<>(expenseDto,HttpStatus.OK);
+        }catch (Exception ex){
+            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    @GetMapping("/expense/v1/monthly")
+    public ResponseEntity<List<ExpenseDto>> getMonthlyExpenses(){
+        try{
+            List<ExpenseDto> expenseDtoList = expenseService.getMonthlyExpenses();
+            return new ResponseEntity<>(expenseDtoList, HttpStatus.OK);
+        }catch (Exception ex){
+            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        }
+    }
+
 
 
 
